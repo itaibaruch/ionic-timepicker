@@ -12,7 +12,9 @@ angular.module('ionic-timepicker', ['ionic', 'ionic-timepicker.templates'])
         etime: '=etime',        //epoch time getting from a template
         format: '=format',      //format getting from a template
         step: '=step',          //step getting from a template
-        callback: '=callback'   //callback function
+        callback: '=callback',   //callback function
+        min: '=min',
+        max: '=max'
       },
       link: function (scope, element, attrs) {
 
@@ -24,20 +26,33 @@ angular.module('ionic-timepicker', ['ionic', 'ionic-timepicker.templates'])
 
           var objDate = new Date(obj.epochTime * 1000);       // Epoch time in milliseconds.
 
+          var maxTime;
+          if(attrs.max){
+            maxTime = Number(scope.max);
+          }else{
+            maxTime = (obj.format == 12) ? 12 : 23;
+          }
+          var minTime;
+          if(attrs.min){
+            minTime = Number(scope.min);
+          }else{
+            minTime = obj.format == 12 ? 1 : 0;
+          }
+
           scope.increaseHours = function () {
             scope.time.hours = Number(scope.time.hours);
             if (obj.format == 12) {
-              if (scope.time.hours != 12) {
+              if (scope.time.hours != maxTime) {
                 scope.time.hours += 1;
               } else {
-                scope.time.hours = 1;
+                scope.time.hours = minTime;
               }
             }
             if (obj.format == 24) {
-              if (scope.time.hours != 23) {
+              if (scope.time.hours != maxTime) {
                 scope.time.hours += 1;
               } else {
-                scope.time.hours = 0;
+                scope.time.hours = minTime;
               }
             }
             scope.time.hours = (scope.time.hours < 10) ? ('0' + scope.time.hours) : scope.time.hours;
@@ -45,22 +60,24 @@ angular.module('ionic-timepicker', ['ionic', 'ionic-timepicker.templates'])
 
           scope.decreaseHours = function () {
             scope.time.hours = Number(scope.time.hours);
+            
             if (obj.format == 12) {
-              if (scope.time.hours > 1) {
+              if (scope.time.hours > minTime) {
                 scope.time.hours -= 1;
               } else {
-                scope.time.hours = 12;
+                scope.time.hours = maxTime;
               }
             }
             if (obj.format == 24) {
-              if (scope.time.hours > 0) {
+              if (scope.time.hours > minTime) {
                 scope.time.hours -= 1;
               } else {
-                scope.time.hours = 23;
+                scope.time.hours = maxTime;
               }
             }
             scope.time.hours = (scope.time.hours < 10) ? ('0' + scope.time.hours) : scope.time.hours;
           };
+
 
           scope.increaseMinutes = function () {
             scope.time.minutes = Number(scope.time.minutes);
